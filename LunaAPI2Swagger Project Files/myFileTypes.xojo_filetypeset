@@ -1,0 +1,16 @@
+#tag FileTypeSet
+	#tag FileType
+		CodeName=TextJSON
+		Extension=.json
+		Flags=&h0
+		MacCreator=????
+		MacType=TEXT
+		Name=text/json
+		UTI=public.text
+		UTIConformsTo=
+		Description=
+		MimeType=
+		Imported=True
+	#tag EndFileType
+
+#tag EndFileTypeSet
