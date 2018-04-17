@@ -615,9 +615,9 @@ Protected Module questions
 
 	#tag Property, Flags = &h0
 		#tag Note
-			[   {"name": "https", "message": "Does your API support https ?", "type": "confirm", "default": "n"} ]
+			[   {"name": "https", "message": "Does your API support https ?", "type": "confirm", "default": "y"} ]
 		#tag EndNote
-		aboutq_httpsq As String = "[   {""name"": ""https"", ""message"": ""Does your API support https ?"", ""type"": ""confirm"", ""default"": ""n""} ]"
+		aboutq_httpsq As String = "[   {""name"": ""https"", ""message"": ""Does your API support https ?"", ""type"": ""confirm"", ""default"": ""y""} ]"
 	#tag EndProperty
 
 	#tag Property, Flags = &h0
