@@ -519,37 +519,47 @@ Protected Module execute
 		  
 		  // We convert the returned content (MemoryBlock) to a Text
 		  Dim body As Text = Xojo.Core.TextEncoding.UTF8.ConvertDataToText(Content)
-		  Dim strBody As String=body
-		  
-		  Dim bcompare As Boolean=CompareResults(myAPICall.strTestMethodAndName,url,HTTPStatus,strBody,PathMethod)
-		  Dim bstored As Boolean=StoreResultStructure(myAPICall.strTestMethodAndName,url,HTTPStatus,body,PathMethod)
-		  
-		  Dim jResponses As New JSONItem_MTC(body)
-		  
-		  wndGenerator.taResponse.Text=JSONPrettyPrint(StringToText(jResponses.ToString))
-		  
-		  Dim dDuration As Double=(Microseconds-dStartTime)/1000
-		  wndGenerator.lstTestsRun.Cell(wndGenerator.lstTestsRun.LastIndex,1)=CStr(HTTPStatus)
-		  wndGenerator.lstTestsRun.Cell(wndGenerator.lstTestsRun.LastIndex,2)=Format(dDuration,"#####") + "ms"
-		  wndGenerator.lstTestsRun.CellType(wndGenerator.lstTestsRun.LastIndex,3)=Listbox.TypeCheckbox
-		  wndGenerator.lstTestsRun.CellCheck(wndGenerator.lstTestsRun.LastIndex,3)=bcompare
-		  
-		  Dim jDescription As New JSONItem_MTC
-		  jDescription.Value("description") = HTTPStatusDescription(Cstr(HTTPStatus))
-		  
-		  swaggerSpec.Child("paths").Child(apiPath).Child(PathMethod).Child("responses").Value(Cstr(HTTPStatus))=jDescription
-		  
-		  if strContentType.Instr("application/json") <> 0 and body <> "" Then
+		  Try
+		    Dim strBody As String=body
 		    
-		    //var schemaObj = jsonSchemaGenerator(JSON.parse(body));
-		    Dim schemaObj AS JSONItem_MTC=jsonToSchema(jResponses) //schemaobject
-		    schemaObj.Remove("$schema")
-		    // bug with json scheme generator - work around
-		    // For more details, https://github.com/krg7880/json-schema-generator/issues/13
-		    scan(schemaObj)
-		    swaggerSpec.Child("paths").Child(apiPath).Child(pathMethod).Child("responses").Child(Cstr(HTTPStatus)).Value("schema")=schemaObj
+		    Dim bcompare As Boolean=CompareResults(myAPICall.strTestMethodAndName,url,HTTPStatus,strBody,PathMethod)
+		    Dim bstored As Boolean=StoreResultStructure(myAPICall.strTestMethodAndName,url,HTTPStatus,body,PathMethod)
 		    
-		  end if
+		    Dim jResponses As New JSONItem_MTC(body)
+		    
+		    wndGenerator.taResponse.Text=JSONPrettyPrint(StringToText(jResponses.ToString))
+		    
+		    Dim dDuration As Double=(Microseconds-dStartTime)/1000
+		    wndGenerator.lstTestsRun.Cell(wndGenerator.lstTestsRun.LastIndex,1)=CStr(HTTPStatus)
+		    wndGenerator.lstTestsRun.Cell(wndGenerator.lstTestsRun.LastIndex,2)=Format(dDuration,"#####") + "ms"
+		    wndGenerator.lstTestsRun.CellType(wndGenerator.lstTestsRun.LastIndex,3)=Listbox.TypeCheckbox
+		    wndGenerator.lstTestsRun.CellCheck(wndGenerator.lstTestsRun.LastIndex,3)=bcompare
+		    
+		    Dim jDescription As New JSONItem_MTC
+		    jDescription.Value("description") = HTTPStatusDescription(Cstr(HTTPStatus))
+		    
+		    swaggerSpec.Child("paths").Child(apiPath).Child(PathMethod).Child("responses").Value(Cstr(HTTPStatus))=jDescription
+		    
+		    if strContentType.Instr("application/json") <> 0 and body <> "" Then
+		      
+		      //var schemaObj = jsonSchemaGenerator(JSON.parse(body));
+		      Dim schemaObj AS JSONItem_MTC=jsonToSchema(jResponses) //schemaobject
+		      schemaObj.Remove("$schema")
+		      // bug with json scheme generator - work around
+		      // For more details, https://github.com/krg7880/json-schema-generator/issues/13
+		      scan(schemaObj)
+		      swaggerSpec.Child("paths").Child(apiPath).Child(pathMethod).Child("responses").Child(Cstr(HTTPStatus)).Value("schema")=schemaObj
+		      
+		    end if
+		    
+		  Catch
+		    wndGenerator.taResponse.Text=body
+		    Dim jDescription As New JSONItem_MTC
+		    jDescription.Value("description") = HTTPStatusDescription(Cstr(HTTPStatus))
+		    
+		    swaggerSpec.Child("paths").Child(apiPath).Child(PathMethod).Child("responses").Value(Cstr(HTTPStatus))=jDescription
+		    
+		  End try
 		  
 		  if swaggerSpec.Child("paths").Child(apiPath).Child(pathMethod).HasName("security")=False Then
 		    //we only set this once. not more than one security system per api call
