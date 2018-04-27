@@ -121,7 +121,7 @@ Protected Module execute
 		  if myAPICall.strHost<>"" and myAPICall.strBasePath<>"" and myAPICall.strAPIPath<>"" then
 		    //do we have an extra indentifier that has been added to the APIPath? (for instance an Id)
 		    if myAPICall.jAPIPathParameters<>nil Then
-		      Dim strDynamicPath As String=GetDynamicValuesAPIPath(myAPICall.strAPIVersion, myAPICall.strHTTPMethod, myAPICall.strAPIPath)
+		      Dim strDynamicPath As String=GetDynamicValuesAPIPathTest(myAPICall.strAPIVersion, myAPICall.strHTTPMethod, myAPICall.strAPIPath, myAPICall.strTestName)
 		      if left(strDynamicPath,1)<>"/" Then
 		        strDynamicEndPoint=strEndPoint + myAPICall.strHost.Lowercase + myAPICall.strBasePath + "/" + strDynamicPath
 		      Else
@@ -775,6 +775,71 @@ Protected Module execute
 		End Function
 	#tag EndMethod
 
+	#tag Method, Flags = &h0
+		Function GetDynamicValuesAPIPathTest(strAPIVersion As String, strHTTPMethod As String, strAPIPath As String, strTestName As String) As String
+		  //get all the properties of myAPICalls
+		  Dim myProperties() As Introspection.PropertyInfo = Introspection.GetType(myAPIcalls).getProperties
+		  Dim strAPIPathParts() As String=strAPIPath.Split("/")
+		  Dim strMethodName As String="v" + strAPIVersion + "_" + strAPIPathParts(1) + "_" + strHTTPMethod
+		  Dim strDynamicAPIPath As String
+		  For i As Integer=0 To myProperties.Ubound
+		    //if the name of the property is the same as the name of the api path being called
+		    if myProperties(i).Name=strMethodName Then
+		      //then get the value of the property
+		      Dim strValue As String=myProperties(i).Value(myAPICalls).StringValue
+		      //turn it into a JSONItem_MTC
+		      Dim jTests As JSONItem_MTC = New JSONItem_MTC(strValue)
+		      For j As Integer=0 to jTests.Count-1
+		        //go over the tests
+		        Dim jTest As JSONItem_MTC=jTests.Child(j)
+		        if jTest.Name(0)=strTestName Then
+		          Dim jTestParameters As JSONItem_MTC=jTest.Value(jTest.Name(0))
+		          'if jTestParameters.Value("APIPath").StringValue=strAPIPath Then
+		          //correct test found
+		          Dim strParameterName As String
+		          if jTestParameters.HasName("PathParameters")=False then
+		            strDynamicAPIPath=strAPIPath //no PathParameters Found in test, return original path
+		          else
+		            Dim jPathParameters As JSONItem_MTC=jTestParameters.Child("PathParameters")
+		            if jPathParameters.Count=0 Then
+		              strDynamicAPIPath=strAPIPath //no PathParameters Found in test, return original path
+		            else
+		              for k As Integer=0 to strAPIPathParts.Ubound
+		                if len(strAPIPathParts(k))>2 and left(strAPIPathParts(k),1)="{" and right(strAPIPathParts(k),1)="}" Then
+		                  //for a dynamic parameter in the path
+		                  strParameterName=mid(strAPIPathParts(k),2,len(strAPIPathParts(k))-2)
+		                  for l As Integer=0 to jPathParameters.Count
+		                    if jPathParameters.name(l)=strParameterName then
+		                      //found
+		                      'Dim strValueTmp As String=jPathParameters.Value(strParameterName)
+		                      try
+		                        Dim jValue As JSONItem_MTC
+		                        jValue=jPathParameters.Value(strParameterName)
+		                        Dim strName As String=jValue.name(0)
+		                        Dim strField As String=jValue.Value(strName)
+		                        strAPIPathParts(k)=GetValueFromTest(strName,strField)
+		                      catch
+		                        strAPIPathParts(k)=jPathParameters.Value(strParameterName)
+		                      end try
+		                      exit for
+		                    end if
+		                  next
+		                end if
+		              next
+		              strDynamicAPIPath=Join(strAPIPathParts, "/")
+		            end if
+		          end if
+		          exit for
+		        end if
+		      Next
+		      exit for
+		    end if
+		  Next
+		  Return strDynamicAPIPath
+		  
+		End Function
+	#tag EndMethod
+
 	#tag Method, Flags = &h1
 		Protected Sub GetHeaderParametersInfo(swaggerSpec As JSONItem_MTC, urlObj As URIHelpers.URI, options As JSONItem_MTC)
 		  #Pragma Unused urlObj
@@ -1184,6 +1249,42 @@ Protected Module execute
 	#tag EndMethod
 
 	#tag Method, Flags = &h0
+		Function GetValueFromTest(strTestName As String, strFieldName As String) As String
+		  Dim strReturn As String
+		  Dim mydb As SQLiteDatabase
+		  mydb=OpenDB
+		  if mydb<>nil then
+		    Dim strSQL As String="SELECT currentresponsebody FROM testresults WHERE test='" + strTestName + "';"
+		    Dim rs As RecordSet
+		    rs=mydb.SQLSelect(strSQL)
+		    Dim bError As Boolean
+		    if rs<>nil and rs.eof=False then
+		      Dim strJSON As String
+		      strJSON=rs.Field("currentresponsebody").StringValue
+		      if strJSON<>"" then
+		        Try
+		          Dim jResponse As new JSONItem_MTC(strJSON)
+		          if jResponse.IsArray then
+		            jResponse=jResponse.Value(0)
+		            if jResponse.HasName(strFieldName) Then
+		              strReturn=jResponse.Value(strFieldName).StringValue
+		            else
+		              strReturn=""
+		            end if
+		          else
+		            strReturn=jResponse.Value(strFieldName).StringValue
+		          end if
+		        Catch
+		          strReturn=""
+		        End Try
+		      end if
+		    end if
+		  end if
+		  return strReturn
+		End Function
+	#tag EndMethod
+
+	#tag Method, Flags = &h0
 		Sub InitialiseAPICalls()
 		  //initialise the API docs
 		  myAPIDocs=new APICallDocs
@@ -1571,6 +1672,7 @@ Protected Module execute
 		  myAPICall = New APICall
 		  myAPICall.strAPIVersion=strAPIVersion
 		  myAPICall.strTestMethodAndName=strAPIMethodAndTestName
+		  myAPICall.strTestName=strTestName
 		  myAPICall.strHTTPConnectionMethod=strHTTPConnectionMethod
 		  myAPICall.strHTTPMethod=strHTTPMethod
 		  myAPICall.strHost=strHost
@@ -2589,21 +2691,9 @@ Protected Module execute
 			Type="Boolean"
 		#tag EndViewProperty
 		#tag ViewProperty
-			Name="bResultColumnsLimited"
-			Group="Behavior"
-			InitialValue="False"
-			Type="Boolean"
-		#tag EndViewProperty
-		#tag ViewProperty
 			Name="dStartTime"
 			Group="Behavior"
 			Type="Double"
-		#tag EndViewProperty
-		#tag ViewProperty
-			Name="iBodyCount"
-			Group="Behavior"
-			InitialValue="-1"
-			Type="Integer"
 		#tag EndViewProperty
 		#tag ViewProperty
 			Name="Index"
@@ -2632,13 +2722,13 @@ Protected Module execute
 			EditorType="MultiLineEditor"
 		#tag EndViewProperty
 		#tag ViewProperty
-			Name="strCurrentTestName"
+			Name="strExecuteBasePath"
 			Group="Behavior"
 			Type="String"
 			EditorType="MultiLineEditor"
 		#tag EndViewProperty
 		#tag ViewProperty
-			Name="strExecuteBasePath"
+			Name="strCurrentTestName"
 			Group="Behavior"
 			Type="String"
 			EditorType="MultiLineEditor"
@@ -2679,6 +2769,18 @@ Protected Module execute
 			Group="Position"
 			InitialValue="0"
 			Type="Integer"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="iBodyCount"
+			Group="Behavior"
+			InitialValue="-1"
+			Type="Integer"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="bResultColumnsLimited"
+			Group="Behavior"
+			InitialValue="False"
+			Type="Boolean"
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Module
