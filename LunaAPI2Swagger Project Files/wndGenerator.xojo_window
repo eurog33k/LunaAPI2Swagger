@@ -63,6 +63,7 @@ Begin Window wndGenerator
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   19
+      Transparent     =   False
       Underline       =   False
       UseFocusRing    =   True
       Visible         =   True
@@ -95,6 +96,7 @@ Begin Window wndGenerator
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   52
+      Transparent     =   False
       Underline       =   False
       Visible         =   True
       Width           =   73
@@ -206,6 +208,7 @@ Begin Window wndGenerator
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   52
+      Transparent     =   False
       Underline       =   False
       UseFocusRing    =   True
       Visible         =   True
@@ -238,6 +241,7 @@ Begin Window wndGenerator
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   53
+      Transparent     =   False
       Underline       =   False
       Visible         =   True
       Width           =   73
@@ -319,6 +323,7 @@ Begin Window wndGenerator
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   150
+      Transparent     =   False
       Underline       =   False
       UseFocusRing    =   True
       Visible         =   True
@@ -396,6 +401,7 @@ Begin Window wndGenerator
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   19
+      Transparent     =   False
       Underline       =   False
       UseFocusRing    =   True
       Visible         =   True
@@ -463,6 +469,7 @@ Begin Window wndGenerator
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   84
+      Transparent     =   False
       Underline       =   False
       Visible         =   True
       Width           =   563
@@ -504,6 +511,7 @@ Begin Window wndGenerator
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   20
+      Transparent     =   False
       Underline       =   False
       UseFocusRing    =   True
       Visible         =   True
@@ -588,6 +596,7 @@ Begin Window wndGenerator
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   118
+      Transparent     =   False
       Underline       =   False
       UseFocusRing    =   True
       Visible         =   True
@@ -657,6 +666,7 @@ Begin Window wndGenerator
       TextSize        =   0.0
       TextUnit        =   0
       Top             =   84
+      Transparent     =   False
       Underline       =   False
       Visible         =   True
       Width           =   110

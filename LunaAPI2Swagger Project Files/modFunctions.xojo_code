@@ -53,8 +53,14 @@ Protected Module modFunctions
 		      //if the apiparameters don't contain a value but there is a MyAPIParameterValues jsonitem
 		      //check if the MyAPIParameterValues contains a value for the current field
 		      if MyAPIParameterValues.HasName(strName) Then
-		        //if so, add it to the JSONItem_MTC
-		        targetJSONItem.Value(strName)=MyAPIParameterValues.Value(strName).StringValue
+		        try
+		          //if so, add it to the JSONItem_MTC
+		          Dim jItem As JSONItem_MTC=MyAPIParameterValues.Value(strName)
+		          Dim strItem As String=jItem.ToString
+		          targetJSONItem.Value(strName)=strItem
+		        catch
+		          targetJSONItem.Value(strName)=MyAPIParameterValues.Value(strName).StringValue
+		        end try
 		      end if
 		    end if
 		  next

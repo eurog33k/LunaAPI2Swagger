@@ -61,12 +61,24 @@ Protected Class APICalls
 			"columns": "GivenName,Surname"
 			}
 			}
+			},
+			{
+			"test4": {
+			"APIPath": "/Contacts/{emailaddress}",
+			"PathParameters": {
+			"emailaddress": {
+			"v1_Contacts_POST (test1)": "EmailAddress"
+			}
+			},
+			"QueryParameters": {
+			"columns": "GivenName,Surname"
+			}
+			}
 			}
 			]
 			
-			
 		#tag EndNote
-		v1_Contacts_GET As String = "[ { ""test1"": { ""APIPath"": ""/Contacts"" } }, { ""test2"": { ""APIPath"": ""/Contacts/{emailaddress}"", ""PathParameters"": { ""emailaddress"": ""ShirleySBruce@einrot.com"" } } }, { ""test3"": { ""APIPath"": ""/Contacts/{emailaddress}"", ""PathParameters"": { ""emailaddress"": ""ShirleySBruce@einrot.com"" }, ""QueryParameters"": { ""columns"": ""GivenName,Surname"" } } } ]"
+		v1_Contacts_GET As String = "[ { ""test1"": { ""APIPath"": ""/Contacts"" } }, { ""test2"": { ""APIPath"": ""/Contacts/{emailaddress}"", ""PathParameters"": { ""emailaddress"": ""ShirleySBruce@einrot.com"" } } }, { ""test3"": { ""APIPath"": ""/Contacts/{emailaddress}"", ""PathParameters"": { ""emailaddress"": ""ShirleySBruce@einrot.com"" }, ""QueryParameters"": { ""columns"": ""GivenName,Surname"" } } }, { ""test4"": { ""APIPath"": ""/Contacts/{emailaddress}"", ""PathParameters"": { ""emailaddress"": { ""v1_Contacts_POST (test1)"": ""EmailAddress"" } }, ""QueryParameters"": { ""columns"": ""GivenName,Surname"" } } } ]"
 	#tag EndProperty
 
 	#tag Property, Flags = &h0
@@ -142,6 +154,17 @@ Protected Class APICalls
 		#tag Note
 			[
 			"v1_Reset_GET (test1)",
+			"v1_Contacts_POST (test1)",
+			"v1_Contacts_GET (test4)"
+			]
+		#tag EndNote
+		v1_Sequence As String = "[ ""v1_Reset_GET (test1)"", ""v1_Contacts_POST (test1)"", ""v1_Contacts_GET (test4)"" ]"
+	#tag EndProperty
+
+	#tag Property, Flags = &h0
+		#tag Note
+			[
+			"v1_Reset_GET (test1)",
 			"v1_Contacts_GET (test1)",
 			"v1_Contacts_GET (test2)",
 			"v1_Contacts_GET (test3)",
@@ -150,7 +173,7 @@ Protected Class APICalls
 			"v1_Contacts_DELETE (test1)"
 			]
 		#tag EndNote
-		v1_Sequence As String = "[ ""v1_Reset_GET (test1)"", ""v1_Contacts_GET (test1)"", ""v1_Contacts_GET (test2)"", ""v1_Contacts_GET (test3)"", ""v1_Contacts_POST (test1)"", ""v1_Contacts_PUT (test1)"", ""v1_Contacts_DELETE (test1)"" ]"
+		v2_Sequenceold As String = "[ ""v1_Reset_GET (test1)"", ""v1_Contacts_GET (test1)"", ""v1_Contacts_GET (test2)"", ""v1_Contacts_GET (test3)"", ""v1_Contacts_POST (test1)"", ""v1_Contacts_PUT (test1)"", ""v1_Contacts_DELETE (test1)"" ]"
 	#tag EndProperty
 
 
@@ -195,9 +218,9 @@ Protected Class APICalls
 			Type="Integer"
 		#tag EndViewProperty
 		#tag ViewProperty
-			Name="v1_Contacts_DELETE"
+			Name="v1_Credentials"
 			Group="Behavior"
-			InitialValue="[{""""test1"""":{""""APIPath"""":""""/Contacts/{emailaddress}"""",""""PathParameters"""":{""""emailaddress"""":0}}}]"
+			InitialValue="{ """"Clientnr"""": { """"required"""": true, """"type"""": """"integer"""", """"description"""": """"Clientnr of the Use IT Group client"""" }, """"AccessToken"""": { """"required"""": true, """"type"""": """"string"""", """"description"""": """"AccessToken received from the Use IT Group activation system"""" } }"
 			Type="String"
 			EditorType="MultiLineEditor"
 		#tag EndViewProperty
@@ -205,6 +228,13 @@ Protected Class APICalls
 			Name="v1_Contacts_GET"
 			Group="Behavior"
 			InitialValue="[{""""test1"""":{""""APIPath"""":""""/Contacts""""}},{""""test2"""":{""""APIPath"""":""""/Contacts/{emailaddress}"""",""""PathParameters"""":{""""emailaddress"""":""""""""}}}]"
+			Type="String"
+			EditorType="MultiLineEditor"
+		#tag EndViewProperty
+		#tag ViewProperty
+			Name="v1_Contacts_DELETE"
+			Group="Behavior"
+			InitialValue="[{""""test1"""":{""""APIPath"""":""""/Contacts/{emailaddress}"""",""""PathParameters"""":{""""emailaddress"""":0}}}]"
 			Type="String"
 			EditorType="MultiLineEditor"
 		#tag EndViewProperty
@@ -223,9 +253,9 @@ Protected Class APICalls
 			EditorType="MultiLineEditor"
 		#tag EndViewProperty
 		#tag ViewProperty
-			Name="v1_Credentials"
+			Name="v2_Sequenceold"
 			Group="Behavior"
-			InitialValue="{ """"Clientnr"""": { """"required"""": true, """"type"""": """"integer"""", """"description"""": """"Clientnr of the Use IT Group client"""" }, """"AccessToken"""": { """"required"""": true, """"type"""": """"string"""", """"description"""": """"AccessToken received from the Use IT Group activation system"""" } }"
+			InitialValue="[ """"v1_Reset_GET (test1)"""", """"v1_Contacts_GET (test1)"""", """"v1_Contacts_GET (test2)"""", """"v1_Contacts_POST (test1)"""", """"v1_Contacts_PUT (test1)"""", """"v1_Contacts_DELETE (test1)"""" ]"
 			Type="String"
 			EditorType="MultiLineEditor"
 		#tag EndViewProperty
@@ -239,9 +269,8 @@ Protected Class APICalls
 		#tag ViewProperty
 			Name="v1_Sequence"
 			Group="Behavior"
-			InitialValue="[ """"v1_Reset_GET (test1)"""", """"v1_Contacts_GET (test1)"""", """"v1_Contacts_GET (test2)"""", """"v1_Contacts_POST (test1)"""", """"v1_Contacts_PUT (test1)"""", """"v1_Contacts_DELETE (test1)"""" ]"
+			InitialValue="[ """"v1_Reset_GET (test1)"""", """"v1_Contacts_POST (test1)"""", """"v1_Contacts_GET (test4)"""" ]"
 			Type="String"
-			EditorType="MultiLineEditor"
 		#tag EndViewProperty
 	#tag EndViewBehavior
 End Class
